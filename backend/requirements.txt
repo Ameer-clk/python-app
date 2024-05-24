@@ -3,12 +3,12 @@ aws-cdk-lib==2.46.0
 boto3==1.24.95
 botocore==1.27.95
 cattrs==22.1.0
-certifi==2022.12.7
+certifi==2023.7.22
 cffi==1.15.1
 charset-normalizer==2.1.1
 constructs==10.1.132
 coverage==6.5.0
-cryptography==41.0.0
+cryptography==41.0.2
 exceptiongroup==1.0.0rc9
 idna==3.4
 iniconfig==1.1.1
