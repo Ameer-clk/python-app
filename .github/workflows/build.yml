@@ -27,7 +27,7 @@ jobs:
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/node@master
         with:
-          args: snyk test --all-projects
+          args: test /Ameer-clk/python-app
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
@@ -37,3 +37,4 @@ jobs:
           args: monitor
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          
