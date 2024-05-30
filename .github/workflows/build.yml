@@ -14,7 +14,9 @@ jobs:
       - uses: actions/setup-go@v1
         with:
           go-version: '1.13'
-      - name: Update Snyk CLI
+      - name: Remove existing Snyk CLI binary
+        run: rm -f /usr/local/bin/snyk
+      - name: Install Snyk CLI
         run: npm install -g snyk
       - name: Snyk monitor
         run: snyk test /Ameer-clk/python-app
