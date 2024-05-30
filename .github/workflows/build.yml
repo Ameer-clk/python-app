@@ -1,40 +1,35 @@
-name: Snyk Security Scan
+name: Build and Scan
 
 on:
   push:
     branches:
-      - main  # Adjust this to the branches you want to scan
+      - main
 
 jobs:
-  snyk:
-    name: Snyk Security Scan
+  build-and-scan:
+    name: Build, Scan, and Analyze
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v2
         with:
-          fetch-depth: 0  # Ensure full repo is fetched for a thorough scan
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'  # Adjust the Node.js version as needed
+        - name: Synk Security Scan
+          uses: synkio/github-action@v2
+          with:
+            auth-token: ${{ secrets.SYNK_AUTH_TOKEN }}
+            fail-on: high,medium,low # Fail the workflow for vulnerabilities of high, medium, and low severity
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        with:
-          args: snyk test /Ameer-clk/python-app  # Adjust the directory as needed
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@master
         env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-      - name: Report results to Snyk
-        uses: snyk/actions/node@master
-        with:
-          args: monitor
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # - uses: sonarsource/sonarqube-quality-gate-action@master
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
