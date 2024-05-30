@@ -15,11 +15,11 @@ jobs:
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
-        - name: Synk Security Scan
-          uses: synkio/github-action@v2
-          with:
-            auth-token: ${{ secrets.SYNK_AUTH_TOKEN }}
-            fail-on: high,medium,low # Fail the workflow for vulnerabilities of high, medium, and low severity
+      - name: Synk Security Scan
+        uses: synkio/github-action@v2
+        with:
+          auth-token: ${{ secrets.SYNK_AUTH_TOKEN }}
+          fail-on: high,medium,low # Fail the workflow for vulnerabilities of high, medium, and low severity
 
       - name: SonarQube Scan
         uses: sonarsource/sonarqube-scan-action@master
