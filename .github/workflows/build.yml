@@ -1,5 +1,8 @@
-name: workflow for Maven using Snyk security scan
-on: push
+name: Snyk checker 
+on:
+  push:
+    branches:
+      - main
 jobs:
   security:
     runs-on: ubuntu-latest
