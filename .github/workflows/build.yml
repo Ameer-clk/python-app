@@ -1,62 +1,31 @@
-name: Build
-
+name: Snyk example
 on:
   push:
     branches:
       - main
-
-
 jobs:
-  build:
-    name: Build and analyze
+  security:
     runs-on: ubuntu-latest
-    
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      # - uses: sonarsource/sonarqube-quality-gate-action@master
-      #   timeout-minutes: 5
-      #   env:
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
- jobs:
-   snyk:
-     name: Snyk Security Scan
-     runs-on: ubuntu-latest
-    
-   steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Ensure full repo is fetched for a thorough scan
-
+      - uses: actions/checkout@v2
+      
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: '14'  # Adjust the Node.js version as needed
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/node@master
-        with:
-          args: test
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Report results to Snyk
-        uses: snyk/actions/node@master
-        with:
-          args: monitor
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          
+          node-version: '14'
+      
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+      
+      - name: Authenticate with Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+      
+      - name: List directories
+        run: |
+          find . -type d -not -path '*/\.*' -print0 | while IFS= read -r -d '' directory; do
+            cd "$directory"
+            echo "Testing vulnerabilities in $directory"
+            snyk test
+            cd ..
+          done
           
