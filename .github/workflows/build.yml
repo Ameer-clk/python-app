@@ -20,12 +20,13 @@ jobs:
       - name: Authenticate with Snyk
         run: snyk auth ${{ secrets.SNYK_TOKEN }}
       
-      - name: List directories
+      - name: List directories and test with Snyk
         run: |
           find . -type d -not -path '*/\.*' -print0 | while IFS= read -r -d '' directory; do
-            cd "$directory"
-            echo "Testing vulnerabilities in $directory"
-            snyk test
-            cd ..
+            if [ -n "$(find "$directory" -maxdepth 1 -name 'package.json' -o -name 'requirements.txt' -o -name 'pom.xml' -o -name '*.sln' -o -name 'Gemfile' -o -name 'go.mod' -o -name 'Cargo.toml')" ]; then
+              echo "Testing vulnerabilities in $directory"
+              snyk test "$directory"
+            else
+              echo "No supported target files in $directory"
+            fi
           done
-          
