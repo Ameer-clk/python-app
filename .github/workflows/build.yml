@@ -1,4 +1,4 @@
-name: Snyk example
+name: Snyk checker
 on:
   push:
     branches:
@@ -7,36 +7,12 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@master
+      - uses: snyk/actions/setup@master
+      - uses: actions/setup-go@v1
         with:
-          node-version: '14'
-      
-      - name: Install Snyk CLI
-        run: npm install -g snyk
-      
-      - name: Authenticate with Snyk
-        run: snyk auth ${{ secrets.SNYK_TOKEN }}
-      
-      - name: List directories and test with Snyk
-        run: |
-          find . -type d -not -path '*/\.*' -print0 | while IFS= read -r -d '' directory; do
-            if [ -n "$(find "$directory" -maxdepth 1 -name 'package.json' -o -name 'requirements.txt' -o -name 'pom.xml' -o -name '*.sln' -o -name 'Gemfile' -o -name 'go.mod' -o -name 'Cargo.toml')" ]; then
-              echo "Testing vulnerabilities in $directory"
-              cd "$directory"
-              if [ -f "package.json" ]; then
-                echo "Installing npm dependencies in $directory"
-                npm install
-              fi
-              if [ -f "requirements.txt" ]; then
-                echo "Installing pip dependencies in $directory"
-                pip install -r requirements.txt
-              fi
-              snyk test
-              cd -
-            else
-              echo "No supported target files in $directory"
-            fi
-          done
+          go-version: '1.13'
+      - name: Snyk monitor
+        run: snyk test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
